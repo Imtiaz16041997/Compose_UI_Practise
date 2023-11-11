@@ -39,6 +39,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.imtiaz.composepractices.ui.theme.AquaBlue
 import com.imtiaz.composepractices.ui.theme.Beige1
 import com.imtiaz.composepractices.ui.theme.Beige2
 import com.imtiaz.composepractices.ui.theme.Beige3
@@ -47,6 +48,7 @@ import com.imtiaz.composepractices.ui.theme.BlueViolet2
 import com.imtiaz.composepractices.ui.theme.BlueViolet3
 import com.imtiaz.composepractices.ui.theme.ButtonBlue
 import com.imtiaz.composepractices.ui.theme.DarkerButtonBlue
+import com.imtiaz.composepractices.ui.theme.DeepBlue
 import com.imtiaz.composepractices.ui.theme.LightGreen1
 import com.imtiaz.composepractices.ui.theme.LightGreen2
 import com.imtiaz.composepractices.ui.theme.LightGreen3
@@ -55,12 +57,16 @@ import com.imtiaz.composepractices.ui.theme.OrangeYellow1
 import com.imtiaz.composepractices.ui.theme.OrangeYellow2
 import com.imtiaz.composepractices.ui.theme.OrangeYellow3
 import com.imtiaz.composepractices.ui.theme.TextWhite
+import java.nio.file.WatchEvent
 
 @Composable
 fun HomeScreen(){
     Box(modifier = Modifier
         .fillMaxSize()
-        .background(Color(0xFFCA8E8E))) {
+        .background(DeepBlue)
+        .fillMaxSize()
+    )
+        {
         Column {
             GreetingSection() //Heading
             ChipSection(chips = listOf("Sweet sleep", "Insomnia","Depression"))
@@ -100,6 +106,13 @@ fun HomeScreen(){
             )
 
         }
+            BottomMenu(items = listOf(
+                BottomMenuContent("Home",R.drawable.ic_home),
+                BottomMenuContent("Meditate",R.drawable.ic_meditate),
+                BottomMenuContent("Sleep",R.drawable.ic_home),
+                BottomMenuContent("Music",R.drawable.ic_music),
+                BottomMenuContent("Profile",R.drawable.ic_profile),
+            ))
     }
 }
 
@@ -119,19 +132,21 @@ fun GreetingSection(
         Column(verticalArrangement = Arrangement.Center) {
             Text(
                 text = "Good Morning, $name",
-                style = MaterialTheme.typography.headlineSmall
+                style = MaterialTheme.typography.headlineSmall,
+                color = TextWhite
             )
 
             Text(
                 text = "we wish you have a nice day!",
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyLarge,
+                color = TextWhite
             )
 
         }
 
         Icon(painter = painterResource(id = R.drawable.ic_search_icon),
             contentDescription = "Search",
-            tint = Color.Red,
+            tint = Color.White,
             modifier = Modifier.size(24.dp)
         )
 
@@ -229,6 +244,7 @@ fun CurrentMeditation(color: Color = Color.Yellow) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(text = "Features",
             style = MaterialTheme.typography.headlineLarge,
+            color = TextWhite,
             modifier = Modifier.padding(15.dp))
 
         LazyVerticalGrid(
@@ -248,7 +264,8 @@ fun CurrentMeditation(color: Color = Color.Yellow) {
 @Composable
 fun FeatureItem(feature: Feature) {
 
-    BoxWithConstraints(modifier = Modifier.padding(7.5.dp)
+    BoxWithConstraints(modifier = Modifier
+        .padding(7.5.dp)
         .aspectRatio(1f)
         .clip(RoundedCornerShape(10.dp))
         .background(feature.darkColor)) {
@@ -305,11 +322,11 @@ fun FeatureItem(feature: Feature) {
         }
 
         Box(
-            modifier =
-            Modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(
-                    15.dp)) {
+                    15.dp
+                )) {
             Text(
                 text = feature.title,
                 style = MaterialTheme.typography.headlineMedium,
@@ -330,15 +347,92 @@ fun FeatureItem(feature: Feature) {
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
 
-                    .clickable{// Handle the
+                    .clickable {// Handle the
 
-                        }
+                    }
                     .align(Alignment.BottomEnd)
                     .clip(RoundedCornerShape(10.dp))
                     .background(ButtonBlue)
                     .padding(vertical = 6.dp, horizontal = 15.dp))
         }
     }
+}
+
+
+//Bottom Menu
+
+@Composable
+fun BottomMenu(
+    items: List<BottomMenuContent>,
+    modifier: Modifier = Modifier,
+    activeHighlightColor: Color = ButtonBlue,
+    activeTextColor: Color = Color.White,
+    inactiveTextColor: Color = AquaBlue,
+    initialSelectedItemIndex: Int = 0
+) {
+
+    var selectedItemIndex by remember {
+        mutableStateOf(initialSelectedItemIndex)
+    }
+
+    Row(
+        horizontalArrangement = Arrangement.SpaceAround,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .fillMaxWidth()
+            .background(DeepBlue)
+            .padding(15.dp)
+    ) {
+        items.forEachIndexed { index, item ->
+
+            BottomMenuItem(
+                item = item,
+                isSelected = index == selectedItemIndex,
+                activeHighlightColor = activeHighlightColor,
+                activeTextColor = activeTextColor,
+                inactiveTextColor = inactiveTextColor
+            ){
+                selectedItemIndex = index
+            }
+        }
+    }
+}
+
+@Composable
+fun BottomMenuItem(
+    item: BottomMenuContent,
+    isSelected: Boolean = false,
+    activeHighlightColor: Color = ButtonBlue,
+    activeTextColor: Color = Color.White,
+    inactiveTextColor: Color = AquaBlue,
+    onItemClick: () -> Unit
+) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.clickable {
+            onItemClick()
+        }) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .clip(RoundedCornerShape(10.dp))
+                .background(if (isSelected) activeHighlightColor else Color.Transparent)
+                .padding(10.dp)
+        ) {
+            Icon(
+                painter = painterResource(id = item.iconId),
+                contentDescription = item.title,
+                tint = if (isSelected) activeTextColor else inactiveTextColor,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+        Text(
+            text = item.title,
+            color = if(isSelected) activeTextColor else inactiveTextColor
+
+        )
+    }
+
 }
 
 
