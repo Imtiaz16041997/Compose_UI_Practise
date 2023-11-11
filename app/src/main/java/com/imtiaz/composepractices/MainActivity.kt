@@ -26,7 +26,6 @@ class MainActivity : ComponentActivity() {
 @Preview
 @Composable
 fun ByDefaultPreview(){
-//    uiDesign("imtiaaz")
     HomeScreen()
 }
 
