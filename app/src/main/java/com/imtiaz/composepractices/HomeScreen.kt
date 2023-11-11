@@ -112,7 +112,7 @@ fun HomeScreen(){
                 BottomMenuContent("Sleep",R.drawable.ic_home),
                 BottomMenuContent("Music",R.drawable.ic_music),
                 BottomMenuContent("Profile",R.drawable.ic_profile),
-            ))
+            ), modifier = Modifier.align(Alignment.BottomCenter))
     }
 }
 
